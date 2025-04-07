@@ -1,4 +1,4 @@
-// src/app/login/page.tsx
+// src/app/signup/page.tsx
 'use client';
 
 import { useState, useEffect } from "react";
@@ -10,13 +10,13 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription }
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
 
-export default function LoginPage() {
+export default function SignupPage() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const router = useRouter();
-  const { user, isLoading, signIn } = useAuth();
+  const { user, isLoading, signUp } = useAuth();
 
   // Redirect if already logged in
   useEffect(() => {
@@ -31,7 +31,7 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      await signIn(email, password);
+      await signUp(email, password);
     } catch (error) {
       setError(error instanceof Error ? error.message : 'An error occurred');
     } finally {
@@ -49,9 +49,9 @@ export default function LoginPage() {
         
         <Card className="w-full">
           <CardHeader>
-            <CardTitle>Welcome back</CardTitle>
+            <CardTitle>Create an account</CardTitle>
             <CardDescription>
-              Enter your credentials to login
+              Enter your details to sign up
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
@@ -85,10 +85,10 @@ export default function LoginPage() {
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
               <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? 'Processing...' : 'Sign In'}
+                {isSubmitting ? 'Processing...' : 'Sign Up'}
               </Button>
               <div className="text-center text-sm">
-                Don't have an account? <Link href="/signup" className="text-primary hover:underline">Sign up</Link>
+                Already have an account? <Link href="/login" className="text-primary hover:underline">Sign in</Link>
               </div>
             </CardFooter>
           </form>

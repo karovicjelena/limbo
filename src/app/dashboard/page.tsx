@@ -3,9 +3,9 @@
 import { useAuth } from "@/providers/AuthProvider";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
- 
+
 export default function DashboardPage() {
-  const { user, signOut } = useAuth();
+  const { signOut } = useAuth();
 
   return (
     <div className="min-h-screen p-8">
@@ -18,9 +18,9 @@ export default function DashboardPage() {
         <div className="bg-card rounded-lg p-6 shadow-sm">
           <h2 className="text-xl font-semibold mb-4">Your Daily Log Dashboard</h2>
           <p className="text-muted-foreground mb-6">
-            This is where you'll see your past entries and create new ones.
+            This is where you&apos;ll see your past entries and create new ones.
           </p>
-          
+
           <div className="grid gap-4 md:grid-cols-2">
             <div className="bg-background rounded-lg p-4 border">
               <h3 className="font-medium mb-2">Create a New Entry</h3>
@@ -31,11 +31,11 @@ export default function DashboardPage() {
                 <Link href="/new">New Entry</Link>
               </Button>
             </div>
-            
+
             <div className="bg-background rounded-lg p-4 border">
               <h3 className="font-medium mb-2">View Past Entries</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Look back at your journey and see how far you've come.
+                Look back at your journey and see how far you&apos;ve come.
               </p>
               <Button variant="secondary" asChild>
                 <Link href="/entries">View All</Link>
