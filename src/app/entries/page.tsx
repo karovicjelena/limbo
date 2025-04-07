@@ -9,7 +9,6 @@ import Link from 'next/link';
 import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 
-// Define the Entry type
 type Entry = {
   id: string;
   content: string;
@@ -23,7 +22,6 @@ export default function EntriesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
 
-  // Fetch entries when component mounts
   useEffect(() => {
     const fetchEntries = async () => {
       if (!user) return;
@@ -47,7 +45,6 @@ export default function EntriesPage() {
     fetchEntries();
   }, [user]);
 
-  // Handle entry deletion
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this entry?')) return;
 
@@ -60,17 +57,16 @@ export default function EntriesPage() {
     }
   };
 
-  // Render the mood emoji
   const renderMoodEmoji = (mood: string) => {
     const moodMap: Record<string, string> = {
-      'happy': '🫨',
-      'sad': '🧛🏾‍♀️',
-      'angry': '🖕',
-      'anxious': '🤯',
-      'calm': '˚⊱🪷⊰˚',
-      'excited': '💗',
-      'tired': '🦦',
-      'neutral': '🗿',
+      happy: '🫨',
+      sad: '🧛🏾‍♀️',
+      angry: '🖕',
+      anxious: '🤯',
+      calm: '˚⊱🪷⊰˚',
+      excited: '💗',
+      tired: '🦦',
+      neutral: '🗿',
     };
     return moodMap[mood] || '📝';
   };
@@ -96,7 +92,9 @@ export default function EntriesPage() {
           <div className="text-center py-8">Loading your entries...</div>
         ) : entries.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-muted-foreground mb-4">No entries yet. Start your journey today.</p>
+            <p className="text-muted-foreground mb-4">
+              No entries yet. Start your journey today.
+            </p>
             <Link href="/new">
               <Button>Create Your First Entry</Button>
             </Link>
@@ -122,9 +120,9 @@ export default function EntriesPage() {
                           <Edit className="h-4 w-4" />
                         </Button>
                       </Link>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() => handleDelete(entry.id)}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -137,7 +135,7 @@ export default function EntriesPage() {
                   {entry.ai_reflection && (
                     <div className="mt-4 pt-3 border-t border-border">
                       <p className="text-sm italic text-muted-foreground">
-                        "{entry.ai_reflection}"
+                        &quot;{entry.ai_reflection}&quot;
                       </p>
                     </div>
                   )}
