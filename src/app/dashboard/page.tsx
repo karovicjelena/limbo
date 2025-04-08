@@ -1,48 +1,139 @@
 'use client';
 
-import { useAuth } from "@/providers/AuthProvider";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/providers/AuthProvider';
+import { supabase } from '@/lib/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import Link from 'next/link';
+import { PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { format } from 'date-fns';
+import { EmptyState } from '@/components/dashboard/EmptyState';
+
+type Entry = {
+  id: string;
+  content: string;
+  mood: string;
+  created_at: string;
+  ai_reflection: string | null;
+};
 
 export default function DashboardPage() {
-  const { signOut } = useAuth();
+  const { user } = useAuth();
+  const [entries, setEntries] = useState<Entry[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEntries = async () => {
+      if (!user) return;
+
+      try {
+        setIsLoading(true);
+        const { data, error } = await supabase
+          .from('entries')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setEntries(data || []);
+      } catch (error) {
+        console.error('Error fetching entries:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEntries();
+  }, [user]);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this entry?')) return;
+
+    try {
+      const { error } = await supabase.from('entries').delete().eq('id', id);
+      if (error) throw error;
+      setEntries(entries.filter(entry => entry.id !== id));
+    } catch (error) {
+      console.error('Error deleting entry:', error);
+    }
+  };
+
+  const renderMoodEmoji = (mood: string) => {
+    const moodMap: Record<string, string> = {
+      'happy': '🫨',
+      'sad': '🧛🏾‍♀️',
+      'angry': '🖕',
+      'anxious': '🤯',
+      'calm': '˚⊱🪷⊰˚',
+      'excited': '💗',
+      'tired': '🦦',
+      'neutral': '🗿',
+    };
+    return moodMap[mood] || '📝';
+  };
 
   return (
     <div className="min-h-screen p-8">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Welcome to Limbo</h1>
-          <Button onClick={signOut} variant="outline">Sign Out</Button>
+          <Button onClick={() => window.location.href = '/new'} variant="outline">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            New Entry
+          </Button>
         </div>
-
-        <div className="bg-card rounded-lg p-6 shadow-sm">
-          <h2 className="text-xl font-semibold mb-4">Your Daily Log Dashboard</h2>
-          <p className="text-muted-foreground mb-6">
-            This is where you&apos;ll see your past entries and create new ones.
-          </p>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="bg-background rounded-lg p-4 border">
-              <h3 className="font-medium mb-2">Create a New Entry</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Record your thoughts, feelings, and experiences from today.
-              </p>
-              <Button asChild>
-                <Link href="/new">New Entry</Link>
-              </Button>
-            </div>
-
-            <div className="bg-background rounded-lg p-4 border">
-              <h3 className="font-medium mb-2">View Past Entries</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Look back at your journey and see how far you&apos;ve come.
-              </p>
-              <Button variant="secondary" asChild>
-                <Link href="/entries">View All</Link>
-              </Button>
-            </div>
+        
+        {isLoading ? (
+          <div className="text-center py-8">
+            <p className="text-lg animate-pulse">Loading your journey...</p>
           </div>
-        </div>
+        ) : entries.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {entries.map((entry) => (
+              <Card key={entry.id} className="overflow-hidden">
+                <CardHeader className="pb-2">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <div className="flex items-center gap-2 font-semibold">
+                        {entry.mood && renderMoodEmoji(entry.mood)}
+                        <span>{format(new Date(entry.created_at), 'MMMM d, yyyy')}</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {format(new Date(entry.created_at), 'h:mm a')}
+                      </p>
+                    </div>
+                    <div className="flex gap-1">
+                      <Link href={`/edit/${entry.id}`}>
+                        <Button variant="ghost" size="icon">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </Link>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => handleDelete(entry.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="line-clamp-4 text-sm">{entry.content}</p>
+                  {entry.ai_reflection && (
+                    <div className="mt-4 pt-3 border-t border-border">
+                      <p className="text-sm italic text-muted-foreground">
+                        "{entry.ai_reflection}"
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

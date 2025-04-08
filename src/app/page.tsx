@@ -1,15 +1,14 @@
-// src/app/page.tsx
 'use client';
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Link from "next/link";
-import { format } from "date-fns";
 import { DemoEntryForm } from "@/components/demo/DemoEntryForm";
 import { SignupPromptModal } from "@/components/demo/SignupPromptModal";
+import { SampleEntries } from "@/components/landing/SampleEntries";
+import { Timeline } from "@/components/landing/Timeline";
 
 export default function Home() {
   const router = useRouter();
@@ -41,16 +40,19 @@ export default function Home() {
       date: new Date(2025, 3, 6),
       mood: 'excited',
       content: "Got the promotion today!! Team took me out for drinks after work. Still can't believe it's happening!",
+      reflection: "You're allowing yourself to celebrate achievements fully - this joy fuels your next steps forward."
     },
     {
       date: new Date(2025, 3, 7),
       mood: 'tired',
       content: "Back-to-back meetings all day. Need to learn to say no sometimes. At least I managed to squeeze in a quick walk at lunch.",
+      reflection: "Even in your busiest moments, you found space to breathe. Your boundaries are evolving."
     },
     {
       date: new Date(2025, 3, 8),
       mood: 'calm',
       content: "Meditation session actually worked today. 10 minutes of peace before the chaos. Might make this a daily thing.",
+      reflection: "You're discovering tools that center you. Small practices often create the most profound shifts."
     }
   ];
 
@@ -96,37 +98,20 @@ export default function Home() {
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12">Your Journey Visualized</h2>
-          
-          <div className="grid gap-6 md:grid-cols-3">
-            {sampleEntries.map((entry, index) => (
-              <Card key={index} className="overflow-hidden hover:shadow-md transition-shadow">
-                <CardHeader className="pb-2">
-                  <div>
-                    <div className="flex items-center gap-2 font-semibold">
-                      {entry.mood && moods.find(m => m.value === entry.mood)?.emoji}
-                      <span>{format(entry.date, 'MMMM d, yyyy')}</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {format(entry.date, 'h:mm a')}
-                    </p>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="line-clamp-4 text-sm">{entry.content}</p>
-                  <div className="mt-4 pt-3 border-t border-border">
-                    <p className="text-sm italic text-muted-foreground">
-                      "Remember that progress isn't always linear. Today's challenges are building tomorrow's strength."
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <SampleEntries entries={sampleEntries} moods={moods} />
+        </div>
+      </section>
+
+      {/* Timeline Section */}
+      <section className="py-16 px-4 bg-muted/50">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12">Track Your Progress</h2>
+          <Timeline moods={moods} />
         </div>
       </section>
 
       {/* How It Works Section */}
-      <section className="py-16 px-4 bg-muted/50">
+      <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
           
