@@ -1,3 +1,4 @@
+// src/providers/AuthProvider.tsx
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
@@ -21,27 +22,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Initial session check and subscription to auth changes
     const getSession = async () => {
       setIsLoading(true);
       
       try {
-        // Get the current session if any
+        // Get the current session
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error("Error getting session:", error);
+          console.error("Auth session error:", error);
+          // Clear any potentially corrupted tokens
+          await supabase.auth.signOut();
+          setSession(null);
+          setUser(null);
         } else {
           setSession(data.session);
           setUser(data.session?.user ?? null);
         }
       } catch (error) {
-        console.error("Unexpected error getting session:", error);
+        console.error("Unexpected auth error:", error);
+        // Clear any potentially corrupted tokens on unexpected errors
+        await supabase.auth.signOut();
+        setSession(null);
+        setUser(null);
       } finally {
         setIsLoading(false);
       }
 
-      // Listen for auth state changes
+      // Set up auth state change listener
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
         (_event, session) => {
           setSession(session);
@@ -49,7 +57,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       );
 
-      // Cleanup function to unsubscribe when the component unmounts
       return () => subscription.unsubscribe();
     };
 
@@ -58,7 +65,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({ 
+        email, 
+        password 
+      });
       
       if (error) {
         console.error("Sign in error:", error);
