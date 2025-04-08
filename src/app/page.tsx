@@ -5,18 +5,15 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Link from "next/link";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { format } from "date-fns";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { DemoEntryForm } from "@/components/demo/DemoEntryForm";
+import { SignupPromptModal } from "@/components/demo/SignupPromptModal";
 
 export default function Home() {
   const router = useRouter();
   const { user, isLoading } = useAuth();
-  const [demoMood, setDemoMood] = useState('');
-  const [demoContent, setDemoContent] = useState('');
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
 
   // Redirect if already logged in
@@ -26,7 +23,7 @@ export default function Home() {
     }
   }, [user, isLoading, router]);
 
-  // Array of mood options with emojis and labels
+  // Array of mood options with emojis and labels - needed for rendering sample entries
   const moods = [
     { value: 'happy', emoji: '🫨', label: 'Delulu and Thriving' },         
     { value: 'sad', emoji: '🧛🏾‍♀️', label: 'Existential Dread' },        
@@ -56,11 +53,6 @@ export default function Home() {
       content: "Meditation session actually worked today. 10 minutes of peace before the chaos. Might make this a daily thing.",
     }
   ];
-
-  const handleDemoSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setShowSignupPrompt(true);
-  };
 
   if (isLoading) {
     return (
@@ -95,83 +87,8 @@ export default function Home() {
       <section className="py-16 px-4 bg-muted/50">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12">Try It Out</h2>
-          
-          <Card className="shadow-lg">
-            <CardHeader className="text-lg font-medium">How are you feeling today?</CardHeader>
-            <CardContent>
-              <form onSubmit={handleDemoSubmit} className="space-y-6">
-                <div className="space-y-3">
-                  <ToggleGroup 
-                    type="single" 
-                    value={demoMood} 
-                    onValueChange={setDemoMood}
-                    className="flex flex-wrap gap-3 justify-center"
-                  >
-                    {moods.map((m) => (
-                      <ToggleGroupItem 
-                        key={m.value} 
-                        value={m.value}
-                        aria-label={m.label}
-                        className="flex flex-col items-center gap-1 h-auto py-2 px-3 min-w-[90px] transition-all hover:scale-105"
-                      >
-                        <span className="text-2xl">{m.emoji}</span>
-                        <span className="text-xs text-center whitespace-normal">{m.label}</span>
-                      </ToggleGroupItem>
-                    ))}
-                  </ToggleGroup>
-                </div>
-                
-                <div className="space-y-3">
-                  <h3 className="text-base font-medium">What happened today?</h3>
-                  <Textarea
-                    value={demoContent}
-                    onChange={(e) => setDemoContent(e.target.value)}
-                    placeholder="Write about your day..."
-                    className="min-h-[150px]"
-                  />
-                </div>
-
-                <Button 
-                  type="submit" 
-                  className="w-full"
-                >
-                  Save Entry
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-          
-          {/* Signup Prompt Modal */}
-          {showSignupPrompt && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-              <Card className="max-w-md w-full">
-                <CardContent className="pt-6">
-                  <div className="text-center space-y-4 py-4">
-                    <Sparkles className="h-12 w-12 text-primary mx-auto" />
-                    <h3 className="text-xl font-bold">Ready to save your thoughts?</h3>
-                    <p className="text-muted-foreground">
-                      Create an account to save this entry and start tracking your journey.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-3 mt-6">
-                      <Button 
-                        className="flex-1" 
-                        onClick={() => router.push('/signup')}
-                      >
-                        Sign Up <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        className="flex-1"
-                        onClick={() => setShowSignupPrompt(false)}
-                      >
-                        Try Again
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
+          <DemoEntryForm onSubmit={() => setShowSignupPrompt(true)} />
+          {showSignupPrompt && <SignupPromptModal onClose={() => setShowSignupPrompt(false)} />}
         </div>
       </section>
 
@@ -257,6 +174,11 @@ export default function Home() {
           <Link href="/signup">Create Your Free Account</Link>
         </Button>
       </section>
+
+      {/* Footer */}
+      <footer className="py-8 px-4 text-center text-muted-foreground">
+        <p>Made with love, not hustle</p>
+      </footer>
     </div>
   );
 }
