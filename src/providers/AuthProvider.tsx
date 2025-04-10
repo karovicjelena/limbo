@@ -108,13 +108,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signOut = async () => {
+  // In your AuthProvider
+const signOut = async () => {
     try {
+      console.log("Signing out user...");
       const { error } = await supabase.auth.signOut();
       
       if (error) {
         console.error("Sign out error:", error);
         throw error;
+      }
+      
+      console.log("Sign out successful, redirecting...");
+      
+      // Force a complete page refresh to the landing page with cache-busting
+      if (typeof window !== 'undefined') {
+        window.location.href = `/?t=${Date.now()}`;
       }
     } catch (error) {
       console.error("Unexpected sign out error:", error);
