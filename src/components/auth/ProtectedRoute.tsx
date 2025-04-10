@@ -1,17 +1,18 @@
+// src/components/auth/ProtectedRoute.tsx
 'use client';
 
 import { useAuth } from '@/providers/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
-// Change from 'export function' to 'export default function'
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (!isLoading && !user) {
-      router.push('/login');
+      // Redirect to the landing page instead of login
+      router.push('/');
     }
   }, [user, isLoading, router]);
 
@@ -21,6 +22,4 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
 
   return user ? <>{children}</> : null;
 }
-
-// Also add a named export for flexibility
 export { ProtectedRoute };

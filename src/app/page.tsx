@@ -17,11 +17,17 @@ export default function Home() {
 
   // Redirect if already logged in
   useEffect(() => {
-    if (user && !isLoading) {
-      router.push('/dashboard');
+    // Only redirect if there's no "view=landing" parameter in the URL
+    if (user && !isLoading && typeof window !== 'undefined') {
+      // Use URLSearchParams in a type-safe way
+      const url = new URL(window.location.href);
+      const params = url.searchParams;
+      
+      if (!params.has('view')) {
+        router.push('/dashboard');
+      }
     }
   }, [user, isLoading, router]);
-
   // Array of mood options with emojis and labels - needed for rendering sample entries
   const moods = [
     { value: 'happy', emoji: '🫨', label: 'Delulu and Thriving' },         

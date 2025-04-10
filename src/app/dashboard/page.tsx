@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import Link from 'next/link';
-import { PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, LogOut, Home } from 'lucide-react';
 import { format } from 'date-fns';
 import { EmptyState } from '@/components/dashboard/EmptyState';
 
@@ -19,7 +19,7 @@ type Entry = {
 };
 
 export default function DashboardPage() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const [entries, setEntries] = useState<Entry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -76,11 +76,22 @@ export default function DashboardPage() {
     <div className="min-h-screen p-8">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Welcome to Limbo</h1>
-          <Button onClick={() => window.location.href = '/new'} variant="outline">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            New Entry
-          </Button>
+          <div className="flex items-center gap-3">
+            <Link href="/?view=landing" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Home className="h-5 w-5" />
+            </Link>
+            <h1 className="text-3xl font-bold">Welcome to Limbo</h1>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={() => window.location.href = '/new'} variant="outline">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              New Entry
+            </Button>
+            <Button onClick={signOut} variant="ghost">
+              <LogOut className="mr-2 h-4 w-4" />
+              Sign Out
+            </Button>
+          </div>
         </div>
         
         {isLoading ? (
